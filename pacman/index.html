@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Pacman Demo</title>
+
+		<style type = "text/css">
+
+			body {
+				background-color: black;
+				margin: 0px;
+			}
+
+
+			div.container{
+				width: 400px;
+				height: 380px;
+				display: flex;
+				justify-content: center;
+			}
+
+			div.row div {
+				width: 20px;
+				height: 20px;
+				margin:0px;
+				padding: 0px;
+				display: inline-block;
+			}
+
+			div.row{
+			/* this is done to create no spacing for each row */
+				height:20px;
+				padding: 0px;
+				margin: 0px;
+
+
+			}
+
+			div.brick{
+				background-color: blueviolet; 
+
+			}
+
+			div.coin{
+				background: url("coin.gif");
+				background-position: center;
+				background-repeat: no-repeat;
+
+			}
+
+			div.empty{
+			
+			}
+
+			div#pacman{
+				background: url("pacman.gif");
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+				width: 20px;
+				height:20px;
+				position:absolute;
+			}
+
+			#pacman.left{
+				transform: rotate(180deg);
+			}
+
+			#pacman.up{
+				transform: rotate(90deg);
+			}
+
+			#pacman.down{
+				transform: rotate(270deg);
+			}
+
+			#pacman.right{
+				transform: rotate(0deg);
+			}
+
+			div#blue_ghost{
+				background: url("blue_ghost.gif");
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+				width: 20px;
+				height:20px;
+				animation: skew 3s infinite;
+ 				transform: skew(20deg);
+				position:absolute;
+			}
+
+			div.cherry{
+				background: url("cherry.png");
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+				width: 20px;
+				height:20px;
+			}
+
+			div#score{
+				border:1px solid white;
+				width: 30px;
+				height: 20px; 
+				color: white;
+				padding: 7px;
+				text-align: center;
+				position:absolute;
+				top: 10px;
+				left: 410px;
+			}
+
+			div#lives{
+				border:1px solid white;
+				width: 30px;
+				height: 20px; 
+				color: white;
+				padding: 7px;
+				text-align: center;
+				position:absolute;
+				top: 50px;
+				left: 410px;
+			}
+
+
+		</style>
+
+	</head>
+	<body>
+
+	<div id="container">
+
+		<div id="world"></div>
+
+		<div id="pacman"></div>
+
+		<div id="blue_ghost"></div>
+
+		<div id="score">0</div>
+
+		<div id="lives">3</div>
+
+	</div>
+
+		<script>
+
+			var world = [ 
+			// 2 is a brick, 1 is a coin, 0 is an empty square
+				[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+				[2,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,2],
+				[2,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,0,2],
+				[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,2],
+				[2,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
+				[2,1,1,2,0,2,1,1,1,0,1,1,1,1,1,1,1,1,1,2],
+				[2,1,1,2,0,2,1,1,1,1,1,1,1,3,1,1,1,1,0,2],
+				[2,1,1,2,0,2,0,1,1,1,1,1,2,2,2,2,2,1,1,2],
+				[2,1,1,2,0,2,1,1,1,1,1,1,1,1,0,2,1,1,1,2],
+				[2,1,1,2,0,2,1,1,1,1,1,1,1,2,0,2,1,1,1,2],
+				[2,1,1,2,0,2,1,3,0,1,1,1,2,2,0,2,1,1,1,2],
+				[2,1,1,2,2,2,1,1,1,1,1,1,2,0,0,1,0,3,1,2],
+				[2,0,1,1,1,1,1,1,1,1,0,1,2,0,2,1,1,1,1,2],
+				[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+			];
+
+			var score = 0;
+
+			var lives = 3;
+
+			var pacman = {
+				x: 1,
+				y: 12,
+				direction: "right"
+			};
+
+			var blue_ghost = {
+				x: 1,
+				y: 1,
+				direction: "left"
+			}
+
+			function displayWorld(){
+				var output=" ";
+
+				for(var i=0; i<world.length; i++){
+					output += "\n<div class='row'>\n";
+					for (var j=0; j<world[i].length; j++){
+						 if(world[i][j] == 4){
+						output += "<div class='blue_ghost'></div>";
+						}
+						if(world[i][j] == 3){
+							output += "<div class='cherry'></div>";
+						}
+						else if(world[i][j] == 2){
+							output += "<div class='brick'></div>";
+						}
+						else if(world[i][j] == 1){
+							output += "<div class='coin'></div>";
+						}
+						else if(world[i][j] == 0){
+							output += "<div class='empty'></div>";
+						}
+						 
+					}
+					output += "\n</div>";
+				}
+
+				// console.log(output);
+				document.getElementById("world").innerHTML = output;
+			}
+
+			// math.floor(math.random)
+		// setInterval(function(){ alert("Hello"); }, 3000);
+
+		function displayBlueGhost(){
+			document.getElementById('blue_ghost').style.left = blue_ghost.x*20 + "px";
+			document.getElementById('blue_ghost').style.top = blue_ghost.y*20 + "px";
+		};
+		
+		function moveGhost(){
+			var directions = ["left", "right", "up", "down"];
+			var randomDirection = directions[Math.floor((Math.random()*directions.length))];
+			if (randomDirection === "left" && world[blue_ghost.y][blue_ghost.x-4] !== 2){
+				blue_ghost.x--;
+			} else if(randomDirection === "right" && world[blue_ghost.y][blue_ghost.x+4] !== 2){
+				blue_ghost.x++;
+			} else if(randomDirection === "up" && world[blue_ghost.y+1][blue_ghost.x] !== 2){
+				blue_ghost.y++;
+			} else if(randomDirection === "down" && world[blue_ghost.y-1][blue_ghost.x] !== 2){
+				blue_ghost.y--;
+			}
+			displayBlueGhost();
+			decidePacmanAction();
+		}
+
+		setInterval(moveGhost, 300);
+
+		var pacmanElement = document.getElementById('pacman');
+
+		function displayPacman(){
+			document.getElementById('pacman').style.left = pacman.x*20 + "px";
+			document.getElementById('pacman').style.top = pacman.y*20 + "px";
+			pacmanElement.classList.remove("left");
+			pacmanElement.classList.remove("right");
+			pacmanElement.classList.remove("up");
+			pacmanElement.classList.remove("down");
+			pacmanElement.classList.add(pacman.direction);
+
+		};
+
+
+		function displayScore(){
+			document.getElementById('score').innerHTML = score;
+		};
+
+		function displayLives(){
+			document.getElementById('lives').innerHTML = lives;
+		};
+
+		displayWorld();
+		displayPacman();
+		displayBlueGhost();
+		displayScore();
+		displayLives();
+		
+
+		
+
+		document.onkeydown = function(e){
+			
+			if(e.keyCode == 37 && world[pacman.y][pacman.x-1] !== 2){
+				pacman.x--;
+				pacman.direction = "left";
+			}
+			else if (e.keyCode == 39 && world[pacman.y][pacman.x+1] !== 2){
+				pacman.x++;
+				pacman.direction = "right";
+			}
+			else if (e.keyCode == 38 && world[pacman.y-1][pacman.x] !== 2){
+				pacman.y--;
+				pacman.direction = "down";
+			}
+			else if (e.keyCode == 40 && world[pacman.y+1][pacman.x] !== 2){
+				pacman.y++;
+				pacman.direction = "up";
+			}
+			displayPacman();
+			decidePacmanAction();
+			
+		}
+
+
+		function decidePacmanAction(){
+
+			if(world[pacman.y][pacman.x] == 1){
+				world[pacman.y][pacman.x] = 0;
+				score += 10;
+				displayWorld();
+				displayScore();
+
+			} else if(world[pacman.y][pacman.x] == 3){
+				world[pacman.y][pacman.x] = 0;
+				score += 50;
+				displayWorld();
+				displayScore();
+
+			} else if(pacman.y === blue_ghost.y && pacman.x === blue_ghost.x){
+				lives -= 1;
+				pacman.y = 17;
+				pacman.x = 1;
+				displayWorld();
+				displayLives();	
+				if (lives === 0) {
+					alert("Game over!");
+				}
+				
+			}
+			// console.log(e.keyCode);
+
+			displayPacman();
+		}
+
+
+
+			
+		</script>
+
+	</body>
+</html>
